@@ -1,27 +1,39 @@
 package com.sisehat.controller;
 
 import com.sisehat.view.DashboardView;
+import com.sisehat.view.FaskesListView;
+import com.sisehat.view.MainView;
 
 public class DashboardController {
     private DashboardView view;
     private NavigationController navigationController;
-    private ProfileController profileController; // Tambahkan referensi ke ProfileController
+    private ProfileController profileController;
+    private MainView mainView;
+    private FaskesListView faskesListView;
 
-    public DashboardController(DashboardView view, NavigationController navigationController, ProfileController profileController) {
+    public DashboardController(DashboardView view, NavigationController nc, ProfileController pc, MainView mainView, FaskesListView faskesListView) {
         this.view = view;
-        this.navigationController = navigationController;
-        this.profileController = profileController; // Simpan referensinya
+        this.navigationController = nc;
+        this.profileController = pc;
+        this.mainView = mainView;
+        this.faskesListView = faskesListView;
 
-        this.view.getStartDiagnosisButton().addActionListener(e -> goToDiagnosis());
-        this.view.getProfileButton().addActionListener(e -> goToProfile());
-    }
+        // Listener untuk tombol Start Diagnosis
+        this.view.getStartDiagnosisButton().addActionListener(e -> {
+            mainView.reset(); // RESET di sini
+            navigationController.showCard("MAIN");
+        });
 
-    private void goToDiagnosis() {
-        navigationController.showCard("MAIN");
-    }
+        // Listener untuk tombol Profile
+        this.view.getProfileButton().addActionListener(e -> {
+            profileController.loadUserProfileAndHistories();
+            navigationController.showCard("PROFILE");
+        });
 
-    private void goToProfile() {
-        profileController.loadUserProfileAndHistories(); // PENTING: Muat data dulu
-        navigationController.showCard("PROFILE");      // Baru pindah halaman
+        // Listener untuk tombol Faskes
+        this.view.getFaskesButton().addActionListener(e -> {
+            faskesListView.reset(); // RESET di sini
+            navigationController.showCard("FASKES_LIST");
+        });
     }
 }

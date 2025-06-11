@@ -7,8 +7,8 @@ package com.sisehat.model;
  */
 public class Admin extends User {
 
-    public Admin(String fullName, String email, String password) {
+    public Admin(String fullName, String username, String email, String password) {
         // Memanggil constructor dari kelas induknya (User)
-        super(fullName, email, password);
+        super(fullName, username, email, password);
     }
 }

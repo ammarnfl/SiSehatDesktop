@@ -17,39 +17,35 @@ public class LoginController {
         this.dashboardView = dashboardView;
         this.navigationController = navigationController;
 
-        this.view.getLoginButton().addActionListener(e -> loginUser());
-        this.view.getGoToRegisterButton().addActionListener(e -> goToRegister());
+        this.view.getLoginButton().addActionListener(e -> performLogin());
+        this.view.getRegisterButton().addActionListener(e -> navigationController.showCard("REGISTER"));
     }
 
-    private void loginUser() {
-        String email = view.getEmailField().getText();
+    private void performLogin() {
+        String identifier = view.getIdentifierField().getText();
         String password = new String(view.getPasswordField().getPassword());
 
-        if (email.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Email dan password harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+        if (identifier.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "Harap isi semua field.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        boolean loginSuccess = false;
-        User loggedInUser = null;
+        User authenticatedUser = null;
         for (User user : AppDatabase.users) {
-            if (user.getEmail().equals(email) && user.getPassword().equals(password)) {
-                loginSuccess = true;
-                loggedInUser = user;
+            // Cek apakah identifier cocok dengan email ATAU username (abaikan besar kecil huruf)
+            if ((user.getEmail().equalsIgnoreCase(identifier) || user.getUsername().equalsIgnoreCase(identifier))
+                    && user.getPassword().equals(password)) {
+                authenticatedUser = user;
                 break;
             }
         }
 
-        if (loginSuccess) {
-            SessionManager.currentUser = loggedInUser;
-            dashboardView.setWelcomeMessage(loggedInUser.getFullName());
+        if (authenticatedUser != null) {
+            SessionManager.currentUser = authenticatedUser;
+            dashboardView.setWelcomeMessage(authenticatedUser.getFullName());
             navigationController.showCard("DASHBOARD");
         } else {
-            JOptionPane.showMessageDialog(view, "Email atau password salah!", "Login Gagal", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(view, "Email/Username atau Password salah.", "Login Gagal", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    private void goToRegister() {
-        navigationController.showCard("REGISTER");
     }
 }

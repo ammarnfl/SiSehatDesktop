@@ -2,70 +2,77 @@ package com.sisehat;
 
 import com.sisehat.controller.*;
 import com.sisehat.data.AppDatabase;
-import com.sisehat.view.DashboardView;
-import com.sisehat.view.LoginView;
-import com.sisehat.view.MainView;
-import com.sisehat.view.ProfileView;
-import com.sisehat.view.RegisterView;
+import com.sisehat.view.*;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class App {
     public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         AppDatabase.initialize();
+
         SwingUtilities.invokeLater(() -> {
+            JFrame mainFrame = new JFrame("SiSehat - Sistem Diagnosa & Informasi Kesehatan");
             CardLayout cardLayout = new CardLayout();
             JPanel mainPanel = new JPanel(cardLayout);
+
+            // ==================================================================
+            // KODE YANG DIPERBAIKI ADA DI SINI
+            // Constructor NavigationController sekarang hanya menerima 2 argumen
+            // ==================================================================
             NavigationController navigationController = new NavigationController(mainPanel, cardLayout);
 
-            // Buat semua view
-            MainView mainView = new MainView();
-            RegisterView registerView = new RegisterView();
+            // 1. Buat semua View
             LoginView loginView = new LoginView();
+            RegisterView registerView = new RegisterView();
             DashboardView dashboardView = new DashboardView();
-            ProfileView profileView = new ProfileView(); // View baru
+            MainView mainView = new MainView();
+            ProfileView profileView = new ProfileView();
+            DiseaseResultView diseaseResultView = new DiseaseResultView();
+            FaskesResultView faskesResultView = new FaskesResultView();
+            FaskesListView faskesListView = new FaskesListView();
+            FaskesDetailView faskesDetailView = new FaskesDetailView();
 
-            // Buat semua controller
-            new MainController(mainView, navigationController);
-            new RegisterController(registerView, navigationController);
-            ProfileController profileController = new ProfileController(profileView, navigationController); // Buat ProfileController
+            // 2. Buat semua Controller dan hubungkan
+            FaskesDetailController faskesDetailController = new FaskesDetailController(faskesDetailView, navigationController);
+            FaskesResultController faskesResultController = new FaskesResultController(faskesResultView, navigationController, faskesDetailController);
+            ProfileController profileController = new ProfileController(profileView, navigationController);
+
+            new FaskesListController(faskesListView, navigationController, faskesDetailController);
             new LoginController(loginView, dashboardView, navigationController);
-            new DashboardController(dashboardView, navigationController, profileController); // Beri profileController ke DashboardController
+            new RegisterController(registerView, navigationController);
+            new DashboardController(dashboardView, navigationController, profileController, mainView, faskesListView);
 
-            // Masukkan semua view sebagai "kartu"
+            DiseaseResultController diseaseResultController = new DiseaseResultController(diseaseResultView, navigationController, faskesResultController);
+            new MainController(mainView, navigationController, diseaseResultController);
+
+            // 3. Masukkan semua View sebagai "kartu"
             mainPanel.add(loginView, "LOGIN");
             mainPanel.add(registerView, "REGISTER");
             mainPanel.add(dashboardView, "DASHBOARD");
             mainPanel.add(mainView, "MAIN");
-            mainPanel.add(profileView, "PROFILE"); // Daftarkan kartu profil
-
-            // ... (sisa kode JFrame, JMenuBar, dll sama persis) ...
-            JFrame mainFrame = new JFrame("SiSehat");
-            mainFrame.setContentPane(mainPanel);
-
-            JMenuBar menuBar = new JMenuBar();
-            JMenu menuAplikasi = new JMenu("Opsi");
-            JMenuItem profileMenuItem = new JMenuItem("Profil & Riwayat");
-            JMenuItem logoutMenuItem = new JMenuItem("Logout");
-            profileMenuItem.addActionListener(e -> {
-                profileController.loadUserProfileAndHistories();
-                navigationController.showCard("PROFILE");
-            });
-            logoutMenuItem.addActionListener(e -> {
-                SessionManager.currentUser = null;
-                navigationController.showCard("LOGIN");
-            });
-            menuAplikasi.add(profileMenuItem);
-            menuAplikasi.add(logoutMenuItem);
-            menuBar.add(menuAplikasi);
-            mainFrame.setJMenuBar(menuBar);
+            mainPanel.add(profileView, "PROFILE");
+            mainPanel.add(diseaseResultView, "DISEASE_RESULT");
+            mainPanel.add(faskesResultView, "FASKES_RESULT");
+            mainPanel.add(faskesListView, "FASKES_LIST");
+            mainPanel.add(faskesDetailView, "FASKES_DETAIL");
 
             mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            mainFrame.setSize(800, 600);
+            mainFrame.setContentPane(mainPanel);
+            mainFrame.setSize(800, 700);
             mainFrame.setLocationRelativeTo(null);
-            navigationController.showCard("LOGIN");
+
+            // Menampilkan frame setelah semua siap
             mainFrame.setVisible(true);
+
+            // Pindah ke halaman login setelah frame terlihat
+            navigationController.showCard("LOGIN");
         });
     }
 }

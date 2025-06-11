@@ -2,60 +2,48 @@ package com.sisehat.view;
 
 import com.sisehat.data.AppDatabase;
 import com.sisehat.model.Symptom;
-
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import java.util.List;
 
-// Kelas MainView sekarang adalah sebuah JPanel itu sendiri
 public class MainView extends JPanel {
-
-    // 1. Deklarasikan semua komponen yang kita butuhkan sebagai properti kelas
+    private Map<JCheckBox, Symptom> symptomMap = new HashMap<>();
     private JButton diagnoseButton;
-    private final Map<JCheckBox, Symptom> symptomMap = new LinkedHashMap<>();
+    private JButton backButton; // <-- TOMBOL BARU
 
-    // 2. Constructor: Tempat semua komponen dibuat dan disusun
     public MainView() {
-        // Mengatur layout utama untuk panel ini menjadi BorderLayout dengan jarak 10 pixel
         this.setLayout(new BorderLayout(10, 10));
-        this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Memberi jarak dari tepi jendela
+        this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        this.add(new JLabel("Silakan Pilih Gejala yang Anda Rasakan:", SwingConstants.CENTER), BorderLayout.NORTH);
 
-        // --- BAGIAN UTARA: JUDUL ---
-        JLabel titleLabel = new JLabel("Pilih Gejala yang Anda Rasakan:", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        this.add(titleLabel, BorderLayout.NORTH);
-
-        // --- BAGIAN TENGAH: DAFTAR GEJALA ---
-        // Buat panel khusus untuk menampung checkbox
-        JPanel symptomsPanel = new JPanel();
-        symptomsPanel.setLayout(new BoxLayout(symptomsPanel, BoxLayout.Y_AXIS)); // Layout vertikal
-
-        // Isi panel dengan checkbox dari database
+        JPanel checkBoxesPanel = new JPanel(new GridLayout(0, 2, 5, 5));
         for (Symptom symptom : AppDatabase.symptoms) {
             JCheckBox checkBox = new JCheckBox(symptom.getName());
-            checkBox.setFont(new Font("Arial", Font.PLAIN, 14));
-            symptomsPanel.add(checkBox);
             symptomMap.put(checkBox, symptom);
+            checkBoxesPanel.add(checkBox);
         }
-        // Bungkus panel gejala dengan JScrollPane agar bisa di-scroll
-        JScrollPane symptomsScrollPane = new JScrollPane(symptomsPanel);
-        this.add(symptomsScrollPane, BorderLayout.CENTER);
+        this.add(new JScrollPane(checkBoxesPanel), BorderLayout.CENTER);
 
-        // --- BAGIAN SELATAN: TOMBOL ---
-        diagnoseButton = new JButton("Diagnosa Penyakit Saya");
-        diagnoseButton.setFont(new Font("Arial", Font.BOLD, 14));
-        this.add(diagnoseButton, BorderLayout.SOUTH);
+        // Panel Bawah untuk Tombol
+        JPanel bottomPanel = new JPanel(new GridLayout(1, 2, 20, 0)); // Grid 1 baris, 2 kolom
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+        diagnoseButton = new JButton("Diagnosa Sekarang");
+        backButton = new JButton("Kembali ke Dashboard"); // <-- TOMBOL BARU
+
+        bottomPanel.add(backButton);
+        bottomPanel.add(diagnoseButton);
+        this.add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    public JButton getDiagnoseButton() {
-        return diagnoseButton;
+    public void reset() {
+        for (JCheckBox checkBox : symptomMap.keySet()) {
+            checkBox.setSelected(false);
+        }
     }
 
-    // Getter untuk Map
-    public Map<JCheckBox, Symptom> getSymptomMap() {
-        return symptomMap;
-    }
+    // Getters
+    public Map<JCheckBox, Symptom> getSymptomMap() { return symptomMap; }
+    public JButton getDiagnoseButton() { return diagnoseButton; }
+    public JButton getBackButton() { return backButton; } // <-- GETTER BARU
 }

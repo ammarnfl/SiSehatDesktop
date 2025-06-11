@@ -7,6 +7,7 @@ public class DashboardView extends JPanel {
     private JLabel welcomeLabel;
     private JButton startDiagnosisButton;
     private JButton profileButton;
+    private JButton faskesButton;
 
     public DashboardView() {
         this.setLayout(new GridBagLayout());
@@ -26,9 +27,13 @@ public class DashboardView extends JPanel {
         profileButton = new JButton("Profil & Riwayat Diagnosa");
         profileButton.setFont(new Font("Arial", Font.PLAIN, 18));
 
+        faskesButton = new JButton("Daftar Fasilitas Kesehatan");
+        faskesButton.setFont(new Font("Arial", Font.PLAIN, 18));
+
         this.add(welcomeLabel, gbc);
         this.add(startDiagnosisButton, gbc);
         this.add(profileButton, gbc);
+        this.add(faskesButton, gbc);
     }
 
     // Getters
@@ -37,4 +42,5 @@ public class DashboardView extends JPanel {
     public void setWelcomeMessage(String name) {
         this.welcomeLabel.setText("Selamat Datang, " + name + "!");
     }
+    public JButton getFaskesButton() { return faskesButton; }
 }

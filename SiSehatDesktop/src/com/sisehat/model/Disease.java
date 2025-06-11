@@ -11,6 +11,7 @@ public class Disease {
 
     private String name; // Nama penyakit, contoh: "Demam Berdarah"
     private List<Integer> relatedSymptomIds; // Daftar ID dari gejala-gejala yang berhubungan
+    private transient List<Symptom> selectedSymptoms;
 
     public Disease(String name) {
         this.name = name;
@@ -30,5 +31,13 @@ public class Disease {
     // Setter khusus untuk mengatur daftar ID gejala
     public void setRelatedSymptomIds(List<Integer> relatedSymptomIds) {
         this.relatedSymptomIds = relatedSymptomIds;
+    }
+
+    public List<Symptom> getSelectedSymptoms() {
+        return selectedSymptoms;
+    }
+
+    public void setSelectedSymptoms(List<Symptom> selectedSymptoms) {
+        this.selectedSymptoms = selectedSymptoms;
     }
 }
