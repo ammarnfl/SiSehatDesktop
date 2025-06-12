@@ -1,6 +1,6 @@
 package com.sisehat.controller;
 
-import com.sisehat.data.AppDatabase;
+import com.sisehat.data.FasilitasKesehatanDAO;
 import com.sisehat.model.FasilitasKesehatan;
 import com.sisehat.view.FaskesListView;
 
@@ -16,12 +16,21 @@ public class FaskesListController {
     private NavigationController navigationController;
     private FaskesDetailController faskesDetailController;
 
+    // Tambahkan list untuk menampung data dari DB agar tidak query berulang
+    private List<FasilitasKesehatan> allFaskesFromDB;
+
     public FaskesListController(FaskesListView view, NavigationController nc, FaskesDetailController fdc) {
         this.view = view;
         this.navigationController = nc;
         this.faskesDetailController = fdc;
+
+        // Ambil data dari DB sekali saat controller dibuat
+        FasilitasKesehatanDAO faskesDAO = new FasilitasKesehatanDAO();
+        this.allFaskesFromDB = faskesDAO.getAllFasilitasKesehatan();
+
         this.view.getFilterButton().addActionListener(e -> updateFaskesList());
         this.view.getBackButton().addActionListener(e -> navigationController.showCard("DASHBOARD"));
+
         updateFaskesList();
     }
 
@@ -29,8 +38,9 @@ public class FaskesListController {
         String searchText = view.getSearchField().getText().toLowerCase();
         String bpjsStatus = (String) view.getBpjsFilter().getSelectedItem();
         String faskesType = (String) view.getTypeFilter().getSelectedItem();
-        List<FasilitasKesehatan> allFaskes = AppDatabase.healthFacilities;
-        List<FasilitasKesehatan> filteredFaskes = allFaskes.stream()
+
+        // === PERUBAHAN DI SINI: Filter dari list yang sudah ada ===
+        List<FasilitasKesehatan> filteredFaskes = allFaskesFromDB.stream()
                 .filter(f -> f.getName().toLowerCase().contains(searchText))
                 .filter(f -> {
                     if ("Menerima BPJS".equals(bpjsStatus)) return f.isHasBpjs();
@@ -42,6 +52,7 @@ public class FaskesListController {
                     return true;
                 })
                 .collect(Collectors.toList());
+
         displayResults(filteredFaskes);
     }
 
