@@ -3,19 +3,25 @@ package com.sisehat.controller;
 import com.sisehat.data.AppDatabase;
 import com.sisehat.model.User;
 import com.sisehat.view.RegisterView;
+import com.sisehat.view.LoginView;
 
 import javax.swing.*;
 
 public class RegisterController {
     private RegisterView view;
     private NavigationController navigationController;
+    private LoginView loginView;
 
-    public RegisterController(RegisterView view, NavigationController navigationController) {
+    public RegisterController(RegisterView view, NavigationController nc, LoginView loginView) {
         this.view = view;
-        this.navigationController = navigationController;
+        this.navigationController = nc;
+        this.loginView = loginView; // <-- Simpan referensinya
 
         this.view.getRegisterButton().addActionListener(e -> performRegister());
-        this.view.getBackToLoginButton().addActionListener(e -> navigationController.showCard("LOGIN"));
+        this.view.getBackToLoginButton().addActionListener(e -> {
+            loginView.reset(); // Panggil reset SEBELUM pindah halaman
+            navigationController.showCard("LOGIN");
+        });
     }
 
     private void performRegister() {

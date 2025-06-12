@@ -34,6 +34,13 @@ public class RegisterView extends JPanel {
         gbc.gridx = 1; gbc.gridy = 5; backToLoginButton = new JButton("Sudah punya akun? Login"); this.add(backToLoginButton, gbc);
     }
 
+    public void reset() {
+        fullNameField.setText("");
+        usernameField.setText("");
+        emailField.setText("");
+        passwordField.setText("");
+    }
+
     // Getters
     public JTextField getFullNameField() { return fullNameField; }
     public JTextField getUsernameField() { return usernameField; } // <-- GETTER BARU

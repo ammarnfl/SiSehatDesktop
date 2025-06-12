@@ -4,6 +4,7 @@ import com.sisehat.data.AppDatabase;
 import com.sisehat.model.User;
 import com.sisehat.view.DashboardView;
 import com.sisehat.view.LoginView;
+import com.sisehat.view.RegisterView;
 
 import javax.swing.*;
 
@@ -11,14 +12,18 @@ public class LoginController {
     private LoginView view;
     private DashboardView dashboardView;
     private NavigationController navigationController;
-
-    public LoginController(LoginView view, DashboardView dashboardView, NavigationController navigationController) {
+    private RegisterView registerView;
+    public LoginController(LoginView view, DashboardView dashboardView, NavigationController nc, RegisterView registerView) {
         this.view = view;
         this.dashboardView = dashboardView;
-        this.navigationController = navigationController;
+        this.navigationController = nc;
+        this.registerView = registerView;
 
         this.view.getLoginButton().addActionListener(e -> performLogin());
-        this.view.getRegisterButton().addActionListener(e -> navigationController.showCard("REGISTER"));
+        this.view.getRegisterButton().addActionListener(e -> {
+            registerView.reset();
+            navigationController.showCard("REGISTER");
+        });
     }
 
     private void performLogin() {

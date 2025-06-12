@@ -13,6 +13,7 @@ public class FaskesDetailView extends JPanel {
     private JLabel ratingLabel;
     private JLabel typeLabel;
     private JButton contactButton;
+    private JButton openMapsButton; // <-- TOMBOL BARU
     private JButton backButton;
 
     public FaskesDetailView() {
@@ -55,10 +56,17 @@ public class FaskesDetailView extends JPanel {
         detailsGridPanel.add(typeLabel);
         mainContentPanel.add(detailsGridPanel);
 
-        contactButton = new JButton("Hubungi via WhatsApp");
-        contactButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainContentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        mainContentPanel.add(contactButton);
+
+        // ==================================================================
+        // PANEL UNTUK MENAMPUNG TOMBOL-TOMBOL AKSI
+        // ==================================================================
+        JPanel actionButtonPanel = new JPanel(new GridLayout(1, 2, 10, 0)); // 1 baris, 2 kolom
+        contactButton = new JButton("Hubungi via WhatsApp");
+        openMapsButton = new JButton("Buka Lokasi di Peta"); // <-- TOMBOL BARU
+        actionButtonPanel.add(contactButton);
+        actionButtonPanel.add(openMapsButton);
+        mainContentPanel.add(actionButtonPanel);
 
         this.add(mainContentPanel, BorderLayout.CENTER);
 
@@ -83,6 +91,8 @@ public class FaskesDetailView extends JPanel {
         typeLabel.setText(faskes.getType());
     }
 
+    // Getters
     public JButton getBackButton() { return backButton; }
     public JButton getContactButton() { return contactButton; }
+    public JButton getOpenMapsButton() { return openMapsButton; } // <-- GETTER BARU
 }

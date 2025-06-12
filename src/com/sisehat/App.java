@@ -45,8 +45,8 @@ public class App {
             ProfileController profileController = new ProfileController(profileView, navigationController);
 
             new FaskesListController(faskesListView, navigationController, faskesDetailController);
-            new LoginController(loginView, dashboardView, navigationController);
-            new RegisterController(registerView, navigationController);
+            new LoginController(loginView, dashboardView, navigationController, registerView);
+            new RegisterController(registerView, navigationController, loginView);
             new DashboardController(dashboardView, navigationController, profileController, mainView, faskesListView);
 
             DiseaseResultController diseaseResultController = new DiseaseResultController(diseaseResultView, navigationController, faskesResultController);

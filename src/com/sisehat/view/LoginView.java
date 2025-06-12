@@ -26,6 +26,11 @@ public class LoginView extends JPanel {
         gbc.gridx = 1; gbc.gridy = 3; registerButton = new JButton("Belum punya akun? Register"); this.add(registerButton, gbc);
     }
 
+    public void reset() {
+        identifierField.setText("");
+        passwordField.setText("");
+    }
+
     // Getters
     public JTextField getIdentifierField() { return identifierField; } // Getter diubah
     public JPasswordField getPasswordField() { return passwordField; }
