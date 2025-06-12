@@ -1,78 +1,95 @@
 package com.sisehat;
 
 import com.sisehat.controller.*;
-import com.sisehat.data.AppDatabase;
 import com.sisehat.view.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class App {
     public static void main(String[] args) {
+        // Hapus AppDatabase.initialize() dari sini
+
+        // --- BAGIAN SPLASH SCREEN ---
+        JWindow splashWindow = new JWindow();
+        ImageIcon splashIcon = new ImageIcon(App.class.getResource("/images/splash.png"));
+        JLabel splashLabel = new JLabel(splashIcon);
+        splashWindow.add(splashLabel);
+        splashWindow.pack();
+        splashWindow.setLocationRelativeTo(null);
+        splashWindow.setVisible(true);
+
+        // --- BAGIAN UTAMA APLIKASI ---
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        AppDatabase.initialize();
+        Timer timer = new Timer(3000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                splashWindow.dispose();
 
-        SwingUtilities.invokeLater(() -> {
-            JFrame mainFrame = new JFrame("SiSehat - Sistem Diagnosa & Informasi Kesehatan");
-            CardLayout cardLayout = new CardLayout();
-            JPanel mainPanel = new JPanel(cardLayout);
+                JFrame mainFrame = new JFrame("SiSehat - Sistem Diagnosa & Informasi Kesehatan");
+                CardLayout cardLayout = new CardLayout();
+                JPanel mainPanel = new JPanel(cardLayout);
+                NavigationController navigationController = new NavigationController(mainPanel, cardLayout);
 
-            // ==================================================================
-            // KODE YANG DIPERBAIKI ADA DI SINI
-            // Constructor NavigationController sekarang hanya menerima 2 argumen
-            // ==================================================================
-            NavigationController navigationController = new NavigationController(mainPanel, cardLayout);
+                // Buat semua View
+                LoginView loginView = new LoginView();
+                RegisterView registerView = new RegisterView();
+                DashboardView dashboardView = new DashboardView();
+                MainView mainView = new MainView();
+                ProfileView profileView = new ProfileView();
+                DiseaseResultView diseaseResultView = new DiseaseResultView();
+                FaskesResultView faskesResultView = new FaskesResultView();
+                FaskesListView faskesListView = new FaskesListView();
+                FaskesDetailView faskesDetailView = new FaskesDetailView();
 
-            // 1. Buat semua View
-            LoginView loginView = new LoginView();
-            RegisterView registerView = new RegisterView();
-            DashboardView dashboardView = new DashboardView();
-            MainView mainView = new MainView();
-            ProfileView profileView = new ProfileView();
-            DiseaseResultView diseaseResultView = new DiseaseResultView();
-            FaskesResultView faskesResultView = new FaskesResultView();
-            FaskesListView faskesListView = new FaskesListView();
-            FaskesDetailView faskesDetailView = new FaskesDetailView();
+                // ==================================================================
+                // PENGKABELAN ULANG CONTROLLER ADA DI SINI
+                // ==================================================================
 
-            // 2. Buat semua Controller dan hubungkan
-            FaskesDetailController faskesDetailController = new FaskesDetailController(faskesDetailView, navigationController);
-            FaskesResultController faskesResultController = new FaskesResultController(faskesResultView, navigationController, faskesDetailController);
-            ProfileController profileController = new ProfileController(profileView, navigationController);
+                // Buat semua Controller dan hubungkan
+                FaskesDetailController faskesDetailController = new FaskesDetailController(faskesDetailView, navigationController);
+                FaskesResultController faskesResultController = new FaskesResultController(faskesResultView, navigationController, faskesDetailController);
+                ProfileController profileController = new ProfileController(profileView, navigationController);
 
-            new FaskesListController(faskesListView, navigationController, faskesDetailController);
-            new LoginController(loginView, dashboardView, navigationController);
-            new RegisterController(registerView, navigationController);
-            new DashboardController(dashboardView, navigationController, profileController, mainView, faskesListView);
+                new FaskesListController(faskesListView, navigationController, faskesDetailController);
 
-            DiseaseResultController diseaseResultController = new DiseaseResultController(diseaseResultView, navigationController, faskesResultController);
-            new MainController(mainView, navigationController, diseaseResultController);
+                // Constructor Login dan Register diupdate untuk saling memberi referensi
+                new LoginController(loginView, dashboardView, navigationController, registerView);
+                new RegisterController(registerView, navigationController, loginView);
 
-            // 3. Masukkan semua View sebagai "kartu"
-            mainPanel.add(loginView, "LOGIN");
-            mainPanel.add(registerView, "REGISTER");
-            mainPanel.add(dashboardView, "DASHBOARD");
-            mainPanel.add(mainView, "MAIN");
-            mainPanel.add(profileView, "PROFILE");
-            mainPanel.add(diseaseResultView, "DISEASE_RESULT");
-            mainPanel.add(faskesResultView, "FASKES_RESULT");
-            mainPanel.add(faskesListView, "FASKES_LIST");
-            mainPanel.add(faskesDetailView, "FASKES_DETAIL");
+                new DashboardController(dashboardView, navigationController, loginView, mainView, faskesListView, profileController);
+                DiseaseResultController diseaseResultController = new DiseaseResultController(diseaseResultView, navigationController, faskesResultController);
+                new MainController(mainView, navigationController, diseaseResultController);
 
-            mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            mainFrame.setContentPane(mainPanel);
-            mainFrame.setSize(800, 700);
-            mainFrame.setLocationRelativeTo(null);
+                // Masukkan semua View sebagai "kartu"
+                mainPanel.add(loginView, "LOGIN");
+                mainPanel.add(registerView, "REGISTER");
+                mainPanel.add(dashboardView, "DASHBOARD");
+                mainPanel.add(mainView, "MAIN");
+                mainPanel.add(profileView, "PROFILE");
+                mainPanel.add(diseaseResultView, "DISEASE_RESULT");
+                mainPanel.add(faskesResultView, "FASKES_RESULT");
+                mainPanel.add(faskesListView, "FASKES_LIST");
+                mainPanel.add(faskesDetailView, "FASKES_DETAIL");
 
-            // Menampilkan frame setelah semua siap
-            mainFrame.setVisible(true);
+                mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                mainFrame.setContentPane(mainPanel);
+                mainFrame.setSize(800, 700);
+                mainFrame.setLocationRelativeTo(null);
 
-            // Pindah ke halaman login setelah frame terlihat
-            navigationController.showCard("LOGIN");
+                mainFrame.setVisible(true);
+                navigationController.showCard("LOGIN");
+            }
         });
+
+        timer.setRepeats(false);
+        timer.start();
     }
 }

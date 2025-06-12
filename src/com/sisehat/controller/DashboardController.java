@@ -1,39 +1,68 @@
 package com.sisehat.controller;
 
-import com.sisehat.view.DashboardView;
-import com.sisehat.view.FaskesListView;
-import com.sisehat.view.MainView;
+import com.sisehat.view.*;
+import javax.swing.*;
 
 public class DashboardController {
     private DashboardView view;
     private NavigationController navigationController;
-    private ProfileController profileController;
+    private LoginView loginView;
     private MainView mainView;
     private FaskesListView faskesListView;
+    private ProfileController profileController;
 
-    public DashboardController(DashboardView view, NavigationController nc, ProfileController pc, MainView mainView, FaskesListView faskesListView) {
+    public DashboardController(DashboardView view, NavigationController nc, LoginView loginView, MainView mainView, FaskesListView faskesListView, ProfileController pc) {
         this.view = view;
         this.navigationController = nc;
-        this.profileController = pc;
+        this.loginView = loginView;
         this.mainView = mainView;
         this.faskesListView = faskesListView;
+        this.profileController = pc;
 
-        // Listener untuk tombol Start Diagnosis
-        this.view.getStartDiagnosisButton().addActionListener(e -> {
-            mainView.reset(); // RESET di sini
-            navigationController.showCard("MAIN");
-        });
+        // --- PASANG LISTENER ---
+        // Aksi Diagnosa (untuk 2 tombol)
+        this.view.getNavDiagnosaButton().addActionListener(e -> goToDiagnosa());
+        this.view.getStartDiagnosisButton().addActionListener(e -> goToDiagnosa());
 
-        // Listener untuk tombol Profile
-        this.view.getProfileButton().addActionListener(e -> {
-            profileController.loadUserProfileAndHistories();
-            navigationController.showCard("PROFILE");
-        });
+        // Aksi Daftar Faskes (untuk 2 tombol)
+        this.view.getNavFaskesButton().addActionListener(e -> goToFaskes());
+        this.view.getFaskesButton().addActionListener(e -> goToFaskes());
 
-        // Listener untuk tombol Faskes
-        this.view.getFaskesButton().addActionListener(e -> {
-            faskesListView.reset(); // RESET di sini
-            navigationController.showCard("FASKES_LIST");
-        });
+        // Aksi Profil (untuk 2 tombol)
+        this.view.getNavProfileButton().addActionListener(e -> goToProfile());
+        this.view.getProfileButton().addActionListener(e -> goToProfile());
+
+        // Aksi Logout
+        this.view.getNavLogoutButton().addActionListener(e -> performLogout());
+    }
+
+    // --- Kumpulan Aksi Navigasi ---
+    private void goToDiagnosa() {
+        mainView.reset();
+        navigationController.showCard("MAIN");
+    }
+
+    private void goToFaskes() {
+        faskesListView.reset();
+        navigationController.showCard("FASKES_LIST");
+    }
+
+    private void goToProfile() {
+        profileController.loadUserProfileAndHistories();
+        navigationController.showCard("PROFILE");
+    }
+
+    private void performLogout() {
+        int response = JOptionPane.showConfirmDialog(view,
+                "Apakah Anda yakin ingin logout?",
+                "Konfirmasi Logout",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (response == JOptionPane.YES_OPTION) {
+            SessionManager.currentUser = null;
+            loginView.reset();
+            navigationController.showCard("LOGIN");
+        }
     }
 }

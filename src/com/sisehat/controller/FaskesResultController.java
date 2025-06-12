@@ -1,6 +1,6 @@
 package com.sisehat.controller;
 
-import com.sisehat.data.AppDatabase;
+import com.sisehat.data.HistoryDAO;
 import com.sisehat.model.*;
 import com.sisehat.view.FaskesResultView;
 
@@ -100,8 +100,13 @@ public class FaskesResultController {
     }
 
     private void saveAndClose() {
-        History newHistory = new History(SessionManager.currentUser.getEmail(), currentSelectedSymptoms, currentResultingDiseases, currentRecommendations);
-        AppDatabase.histories.add(newHistory);
+        History newHistory = new History(
+                SessionManager.currentUser.getEmail(),
+                currentSelectedSymptoms,
+                currentResultingDiseases,
+                currentRecommendations
+        );
+        new HistoryDAO().saveHistory(newHistory); // <-- Panggil DAO
         JOptionPane.showMessageDialog(view, "Riwayat diagnosa dan rekomendasi Faskes berhasil disimpan!");
         navigationController.showCard("DASHBOARD");
     }

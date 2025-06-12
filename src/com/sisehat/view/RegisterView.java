@@ -120,6 +120,13 @@ public class RegisterView extends JPanel {
         g2.dispose();
     }
 
+    public void reset() {
+        fullNameField.setText("");
+        usernameField.setText("");
+        emailField.setText("");
+        passwordField.setText("");
+    }
+
     // Getters
     public JTextField getFullNameField() { return fullNameField; }
     public JTextField getUsernameField() { return usernameField; } // <-- GETTER BARU

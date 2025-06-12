@@ -146,6 +146,11 @@ public class LoginView extends JPanel {
         g2.dispose();
     }
 
+    public void reset() {
+        identifierField.setText("");
+        passwordField.setText("");
+    }
+
     // Getters
     public JTextField getIdentifierField() {
         return identifierField;

@@ -1,13 +1,16 @@
 package com.sisehat.controller;
 
-import com.sisehat.data.AppDatabase;
+import com.sisehat.data.DiseaseDAO;
 import com.sisehat.model.Diagnosis;
 import com.sisehat.model.Disease;
 import com.sisehat.model.Symptom;
 import com.sisehat.view.MainView;
 
 import javax.swing.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MainController {
@@ -19,10 +22,8 @@ public class MainController {
         this.view = view;
         this.navigationController = navigationController;
         this.diseaseResultController = diseaseResultController;
-
-        // Pasang listener untuk kedua tombol
         this.view.getDiagnoseButton().addActionListener(e -> performDiagnosis());
-        this.view.getBackButton().addActionListener(e -> navigationController.showCard("DASHBOARD")); // <-- LISTENER BARU
+        this.view.getBackButton().addActionListener(e -> navigationController.showCard("DASHBOARD"));
     }
 
     private void performDiagnosis() {
@@ -38,19 +39,23 @@ public class MainController {
             return;
         }
 
+        // === PERUBAHAN DI SINI: Ambil data penyakit dari DAO ===
+        DiseaseDAO diseaseDAO = new DiseaseDAO();
+        List<Disease> allDiseases = diseaseDAO.getAllDiseases();
         List<Diagnosis> diagnosisResults = new ArrayList<>();
-        for (Disease disease : AppDatabase.diseases) {
+
+        for (Disease disease : allDiseases) {
             long matchCount = disease.getRelatedSymptomIds().stream()
                     .filter(id -> selectedSymptoms.stream().anyMatch(s -> s.getId() == id))
                     .count();
 
             if (matchCount > 0) {
                 disease.setSelectedSymptoms(selectedSymptoms);
-
                 int totalGejalaPenyakit = disease.getRelatedSymptomIds().size();
                 diagnosisResults.add(new Diagnosis(disease, (int) matchCount, totalGejalaPenyakit));
             }
         }
+
         List<Disease> topDiseases = diagnosisResults.stream()
                 .sorted(Comparator.comparingDouble(Diagnosis::getMatchPercentage).reversed())
                 .limit(3)

@@ -1,9 +1,10 @@
 package com.sisehat.controller;
 
-import com.sisehat.data.AppDatabase;
+import com.sisehat.data.FasilitasKesehatanDAO;
+import com.sisehat.data.HistoryDAO;
 import com.sisehat.model.Disease;
-import com.sisehat.model.History;
 import com.sisehat.model.Symptom;
+import com.sisehat.model.History;
 import com.sisehat.view.DiseaseResultView;
 import javax.swing.*;
 import java.util.List;
@@ -33,14 +34,13 @@ public class DiseaseResultController {
     }
 
     private void saveAndClose() {
-        // Menyimpan riwayat HANYA dengan hasil penyakit (faskes = null)
         History newHistory = new History(
                 SessionManager.currentUser.getEmail(),
                 currentSelectedSymptoms,
                 currentResultingDiseases,
-                null // Faskes tidak disimpan
+                null // Faskes tidak disimpan di halaman ini
         );
-        AppDatabase.histories.add(newHistory);
+        new HistoryDAO().saveHistory(newHistory); // <-- Panggil DAO
         JOptionPane.showMessageDialog(view, "Riwayat penyakit berhasil disimpan!");
         navigationController.showCard("DASHBOARD");
     }
@@ -50,8 +50,12 @@ public class DiseaseResultController {
     }
 
     private void showRecommendations() {
-        // Oper data ke controller halaman berikutnya
-        faskesResultController.setResults(currentSelectedSymptoms, currentResultingDiseases, AppDatabase.healthFacilities);
+        // ==================================================================
+        // PERUBAHAN UTAMA ADA DI SINI
+        // Ambil data faskes dari DAO, bukan dari AppDatabase lagi.
+        // ==================================================================
+        FasilitasKesehatanDAO faskesDAO = new FasilitasKesehatanDAO();
+        faskesResultController.setResults(currentSelectedSymptoms, currentResultingDiseases, faskesDAO.getAllFasilitasKesehatan());
         navigationController.showCard("FASKES_RESULT");
     }
 }
