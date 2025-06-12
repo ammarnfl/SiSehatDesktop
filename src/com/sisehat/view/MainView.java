@@ -17,11 +17,21 @@ public class MainView extends JPanel {
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(new JLabel("Silakan Pilih Gejala yang Anda Rasakan:", SwingConstants.CENTER), BorderLayout.NORTH);
 
-        JPanel checkBoxesPanel = new JPanel(new GridLayout(0, 2, 5, 5));
+        // 2x4 grid, left-aligned checkboxes in each grid cell
+        JPanel checkBoxesPanel = new JPanel();
+        checkBoxesPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 30, 10, 30); // space-around effect
+        gbc.anchor = GridBagConstraints.WEST; // Align to left in each cell
+        int col = 0, row = 0;
         for (Symptom symptom : AppDatabase.symptoms) {
             JCheckBox checkBox = new JCheckBox(symptom.getName());
             symptomMap.put(checkBox, symptom);
-            checkBoxesPanel.add(checkBox);
+            gbc.gridx = col;
+            gbc.gridy = row;
+            checkBoxesPanel.add(checkBox, gbc);
+            row++;
+            if (row == 4) { row = 0; col++; }
         }
         this.add(new JScrollPane(checkBoxesPanel), BorderLayout.CENTER);
 
